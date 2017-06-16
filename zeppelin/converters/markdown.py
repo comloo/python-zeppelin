@@ -8,8 +8,8 @@ import os
 import cairosvg
 import re
 import base64
-from datetime import datetime
 from dateutil.parser import parse
+
 
 class MarkdownConverter(abc.ABC):
     """ZeppelinConverter is a utility to convert Zeppelin raw json into Markdown."""
