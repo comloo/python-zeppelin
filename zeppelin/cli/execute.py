@@ -3,12 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-import requests
 import os
 import argparse
 import json
 import sys
-from ..executors.notebook_executor import NotebookExecutor 
+from ..executors.notebook_executor import NotebookExecutor
 
 
 def main():
@@ -46,6 +45,6 @@ def main():
             print(err)
             sys.exit(1)
 
+
 if __name__ == '__main__':
     main()
-

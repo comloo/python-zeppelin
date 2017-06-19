@@ -21,8 +21,8 @@ class NotebookExecutor():
 
     def run_notebook(self):
         """Call API to execute notebook."""
-        r = requests.post('http://localhost:{0}/api/notebook/job/{1}'.format(
-                          self.port, self.notebook_id))
+        requests.post('http://localhost:{0}/api/notebook/job/{1}'.format(
+                      self.port, self.notebook_id))
 
     def wait_for_notebook_to_execute(self):
         """Wait for notebook to finish executing before continuing."""
@@ -52,8 +52,8 @@ class NotebookExecutor():
             with open(full_path, 'w') as fh:
                 fh.write(json.dumps(body, indent=2))
         except:
-            print('ERROR: Could not save executed notebook to path: ' + 
-                  self.output_path + 
+            print('ERROR: Could not save executed notebook to path: ' +
+                  self.output_path +
                   ' -- Please provide a valid absolute path.')
 
     def execute_notebook(self):
@@ -63,7 +63,8 @@ class NotebookExecutor():
         directory (unless --clean flag is given in the CLI).
 
         If any errors occur from executing the notebook's paragraphs, they will
-        be displayed in stderr."""
+        be displayed in stderr.
+        """
         self.run_notebook()
         self.wait_for_notebook_to_execute()
         body = self.get_executed_notebook()
@@ -71,7 +72,7 @@ class NotebookExecutor():
         for paragraph in body['paragraphs']:
             if 'results' in paragraph and paragraph['results']['code'] == 'ERROR':
                 print(paragraph['results']['msg'][0]['data'], file=sys.stderr)
-        
+
         if self.is_clean:
             print(json.dumps(body, indent=2))
         else:
