@@ -16,12 +16,11 @@ To convert a Zeppelin .json file into Markdown (.md), run `zeppelin-convert -i <
 If there are png outputs, they will be stored under `/images` in the same location as the output file. 
 
 #### Executor
-To execute a Zeppelin notebook in command line, run `zeppelin-execute -i <<INPUT>> -o <<OUTPUT>> -p <<PORT>>` in the main directory.
+To execute a Zeppelin notebook in command line, run `zeppelin-execute -i <<INPUT>> -o <<OUTPUT>> -u <<URL>>` in the main directory.
 
 - `<<INPUT>>` is the file name. This is a required field.
 - `<<OUTPUT>>` is the path where you want to save the executed json. This is optional. If this is not provided, the output file will be saved to the current directory. The file name is `note.json`.
-- `<<PORT>>` is the port number. This is optional. The default is port `8080`.
-- `--clean` allows the executor to output the executed notebook to terminal rather than to a file.
+- `<<URL>>` is the zeppelin url. This is optional. The default is `localhost:8890`.
 
 ### Testing
 

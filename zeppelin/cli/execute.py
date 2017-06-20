@@ -20,11 +20,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', dest='path_to_notebook_json', required=True,
                         help='Zeppelin notebook input file (.json)')
-    parser.add_argument('-o', dest='output_path',
+    parser.add_argument('-o', dest='output_path', default=sys.stdout,
                         help='Path to save rendered output file (.json) (optional)')
-    parser.add_argument('--clean', dest='clean', action='store_true',
-                        help='If given, output will not be saved to a file.')
-    parser.add_argument('-p', dest='port', default=8080, help='Port number.')
+    parser.add_argument('-u', dest='zeppelin_url', default='localhost:8890',
+                        help='Zeppelin URL (optional)')
     args = parser.parse_args()
 
     with open(args.path_to_notebook_json, 'rb') as notebook:
@@ -32,14 +31,14 @@ def main():
             t = json.load(notebook)
             notebook_id = t['id']
 
-            if args.output_path is None:
+            if args.output_path is sys.stdout:
                 args.output_path = ''
             elif not os.path.isdir(args.output_path):
                 raise ValueError('Output path given is not valid directory.')
 
             output_path = os.path.join(args.output_path, '')
-            notebook_executor = NotebookExecutor(notebook_id, output_path, args.clean,
-                                                 args.port)
+            notebook_executor = NotebookExecutor(notebook_id, output_path,
+                                                 args.zeppelin_url)
             notebook_executor.execute_notebook()
         except ValueError as err:
             print(err)
