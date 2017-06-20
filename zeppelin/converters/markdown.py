@@ -44,8 +44,8 @@ class MarkdownConverter(abc.ABC):
                   'title: ' + title,
                   'author(s): ' + self.user,
                   'tags: ',
-                  'created_at: ' + self.date_created,
-                  'updated_at: ' + self.date_updated,
+                  'created_at: ' + str(self.date_created),
+                  'updated_at: ' + str(self.date_updated),
                   'tldr: ',
                   'thumbnail: ',
                   '---']
@@ -105,17 +105,19 @@ class MarkdownConverter(abc.ABC):
 
     def process_date_created(self, text):
         """Set date_created to the oldest date (date created)."""
+        date = parse(text)
         if self.date_created == 'N/A':
-            self.date_created = text
-        if parse(text) < parse(self.date_created):
-            self.date_created = text
+            self.date_created = date
+        if date < self.date_created:
+            self.date_created = date
 
     def process_date_updated(self, text):
         """Set date_updated to the most recent date (updated date)."""
+        date = parse(text)
         if self.date_updated == 'N/A':
-            self.date_updated = text
-        if parse(text) > parse(self.date_updated):
-            self.date_updated = text
+            self.date_updated = date
+        if date > self.date_updated:
+            self.date_updated = date
 
     def process_title(self, text):
         """Append hashtags before the title.
