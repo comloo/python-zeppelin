@@ -88,6 +88,28 @@ def test_find_message(zc):
     assert zc.find_message(data).group(1) == 'iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAYAAACmKP9/A'
 
 
+def test_process_date_created(zc):
+    zc.process_date_created('Feb 28, 2017 3:44:54 PM')
+    zc.process_date_created('Feb 28, 2017 4:44:54 PM')
+    assert zc.date_created == parse('Feb 28, 2017 3:44:54 PM')
+
+    zc.date_created = 'N/A'
+    zc.process_date_created('2015-07-03T01:43:40+0000')
+    zc.process_date_created('2015-07-04T01:43:40+0000')
+    assert zc.date_created == parse('2015-07-03T01:43:40+0000')
+
+
+def test_process_date_updated(zc):
+    zc.process_date_updated('Feb 28, 2017 3:44:54 PM')
+    zc.process_date_updated('Feb 28, 2017 4:44:54 PM')
+    assert zc.date_updated == parse('Feb 28, 2017 4:44:54 PM')
+
+    zc.date_updated = 'N/A'
+    zc.process_date_updated('2015-07-03T01:43:40+0000')
+    zc.process_date_updated('2015-07-04T01:43:40+0000')
+    assert zc.date_updated == parse('2015-07-04T01:43:40+0000')
+
+
 def test_process_results(zc):
     paragraph = {
         'config': {
