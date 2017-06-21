@@ -46,13 +46,12 @@ class NotebookExecutor():
 
     def save_notebook(self, body):
         """Save notebook depending on user provided output path."""
+        directory = os.path.dirname(self.output_path)
+        full_path = os.path.join(directory, 'note.json')
         try:
-            directory = os.path.dirname(self.output_path)
-            full_path = os.path.join(directory, 'note.json')
-
             with open(full_path, 'w') as fh:
                 fh.write(json.dumps(body, indent=2))
-        except:
+        except ValueError:
             print('ERROR: Could not save executed notebook to path: ' +
                   self.output_path +
                   ' -- Please provide a valid absolute path.')
@@ -60,8 +59,7 @@ class NotebookExecutor():
     def execute_notebook(self):
         """Execute input notebook and save it to file.
 
-        If no output path given, the file will be saved to the input file's
-        directory.
+        If no output path given, the output will be printed to stdout.
 
         If any errors occur from executing the notebook's paragraphs, they will
         be displayed in stderr.
