@@ -7,6 +7,7 @@ import pytest
 from zeppelin.converters.markdown import LegacyConverter
 from dateutil.parser import parse
 
+
 @pytest.fixture
 def zc():
     zc = LegacyConverter('in', 'out', '', 'anonymous', 'N/A', 'N/A')

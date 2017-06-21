@@ -5,6 +5,7 @@
 
 import pytest
 from zeppelin.converters.markdown import NewConverter
+from dateutil.parser import parse
 
 
 @pytest.fixture
