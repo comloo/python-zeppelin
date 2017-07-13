@@ -29,10 +29,17 @@ class NotebookExecutor():
         while True:
             r = requests.get('http://{0}/api/notebook/job/{1}'.format(
                              self.zeppelin_url, self.notebook_id))
+
+            if r.status_code != 200:
+                print('Internal Server Error (500). Trying again in 5 seconds...')
+                time.sleep(5)
+                continue
+
             data = r.json()['body']
             if all(paragraph['status'] in ['FINISHED', 'ERROR'] for paragraph in data):
                 break
-            time.sleep(1)
+
+            time.sleep(2)
 
     def get_executed_notebook(self):
         """Return the executed notebook."""
@@ -56,6 +63,13 @@ class NotebookExecutor():
                   self.output_path +
                   ' -- Please provide a valid absolute path.')
 
+    def get_version(self, body):
+        """Return correct version of Zeppelin file based on JSON format."""
+        if 'results' in body['paragraphs'][0]:
+            return '0.7.1'
+        else:
+            return '0.6.2'
+
     def execute_notebook(self):
         """Execute input notebook and save it to file.
 
@@ -67,12 +81,21 @@ class NotebookExecutor():
         self.run_notebook()
         self.wait_for_notebook_to_execute()
         body = self.get_executed_notebook()
+        version = self.get_version(body)
 
         err = False
+        output = []
         for paragraph in body['paragraphs']:
-            if 'results' in paragraph and paragraph['results']['code'] == 'ERROR':
-                print(paragraph['results']['msg'][0]['data'], file=sys.stderr)
-                err = True
+            if version == '0.7.1':
+                if 'results' in paragraph and paragraph['results']['code'] == 'ERROR':
+                    output.append(paragraph['results']['msg'][0]['data'])
+                    err = True
+            else:
+                if 'result' in paragraph and paragraph['result']['code'] == 'ERROR':
+                    output.append(paragraph['result']['msg'])
+                    err = True
+
+        [print(e.strip() + '\n', file=sys.stderr) for e in output if e]
 
         if err:
             sys.exit(1)
