@@ -26,13 +26,17 @@ class NotebookExecutor():
 
     def wait_for_notebook_to_execute(self):
         """Wait for notebook to finish executing before continuing."""
+        attempt = 0
         while True:
             r = requests.get('http://{0}/api/notebook/job/{1}'.format(
                              self.zeppelin_url, self.notebook_id))
 
-            if r.status_code != 200:
-                print('Internal Server Error (500). Trying again in 5 seconds...')
-                time.sleep(5)
+            if r.status_code == 500:
+                wait_time = 2**attempt
+                print('Notebook is still busy executing. Checking again in {0} seconds...'
+                      .format(wait_time))
+                time.sleep(wait_time)
+                attempt += 1
                 continue
 
             data = r.json()['body']
@@ -63,13 +67,6 @@ class NotebookExecutor():
                   self.output_path +
                   ' -- Please provide a valid absolute path.')
 
-    def get_version(self, body):
-        """Return correct version of Zeppelin file based on JSON format."""
-        if 'results' in body['paragraphs'][0]:
-            return '0.7.1'
-        else:
-            return '0.6.2'
-
     def execute_notebook(self):
         """Execute input notebook and save it to file.
 
@@ -81,19 +78,17 @@ class NotebookExecutor():
         self.run_notebook()
         self.wait_for_notebook_to_execute()
         body = self.get_executed_notebook()
-        version = self.get_version(body)
 
         err = False
         output = []
         for paragraph in body['paragraphs']:
-            if version == '0.7.1':
-                if 'results' in paragraph and paragraph['results']['code'] == 'ERROR':
-                    output.append(paragraph['results']['msg'][0]['data'])
-                    err = True
-            else:
-                if 'result' in paragraph and paragraph['result']['code'] == 'ERROR':
-                    output.append(paragraph['result']['msg'])
-                    err = True
+            if 'results' in paragraph and paragraph['results']['code'] == 'ERROR':
+                output.append(paragraph['results']['msg'][0]['data'])
+                err = True
+
+            elif 'result' in paragraph and paragraph['result']['code'] == 'ERROR':
+                output.append(paragraph['result']['msg'])
+                err = True
 
         [print(e.strip() + '\n', file=sys.stderr) for e in output if e]
 
